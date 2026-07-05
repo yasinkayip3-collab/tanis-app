@@ -25,8 +25,16 @@ jobs:
           flutter-version: '3.24.0'
           channel: 'stable'
 
+      - name: Proje klasörüne gir
+        run: cd tanis_app
+
       - name: Bağımlılıkları yükle
         run: flutter pub get
+        working-directory: tanis_app
+
+      - name: APK derle
+        run: flutter build apk --release --android-skip-build-dependency-validation
+        working-directory: tanis_app
 
       - name: APK derle
         run: flutter build apk --release --android-skip-build-dependency-validation
