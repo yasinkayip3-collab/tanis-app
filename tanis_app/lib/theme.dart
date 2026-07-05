@@ -1,0 +1,12 @@
+import 'package:flutter/material.dart';
+
+// Tüm renkler tek yerden — theme.dart
+const kPrimary       = Color(0xFF7F77DD);
+const kPrimaryLight  = Color(0xFFEEEDFE);
+const kPrimaryDark   = Color(0xFF3C3489);
+const kSuccess       = Color(0xFF1D9E75);
+const kSuccessLight  = Color(0xFFE1F5EE);
+const kTextPrimary   = Color(0xFF1A1A1A);
+const kTextSecondary = Color(0xFF6B6B6B);
+const kBorder        = Color(0xFFE0E0E0);
+const kBackground    = Color(0xFFF8F8F8);

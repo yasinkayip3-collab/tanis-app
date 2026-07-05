@@ -1,0 +1,9 @@
+<svg width="1024" height="500" viewBox="0 0 1024 500" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1024" height="500" fill="#7F77DD"/>
+  <path d="M280 355 C280 355 140 268 140 180 C140 122 178 94 212 113 C230 123 280 175 280 175 C280 175 330 123 348 113 C382 94 420 122 420 180 C420 268 280 355 280 355Z" fill="#534AB7"/>
+  <path d="M512 375 C512 375 330 262 330 152 C330 84 376 54 416 76 C437 88 512 158 512 158 C512 158 587 88 608 76 C648 54 694 84 694 152 C694 262 512 375 512 375Z" fill="white"/>
+  <path d="M512 375 C512 375 346 276 346 172 C346 110 386 83 420 101 C439 111 512 175 512 175 C512 175 585 111 604 101 C638 83 678 110 678 172 C678 276 512 375 512 375Z" fill="none" stroke="white" stroke-width="14" opacity="0.28"/>
+  <path d="M740 348 C740 348 610 268 610 188 C610 136 642 112 668 126 C681 133 740 183 740 183 C740 183 799 133 812 126 C838 112 870 136 870 188 C870 268 740 348 740 348Z" fill="#534AB7"/>
+  <text x="512" y="440" text-anchor="middle" font-family="system-ui,sans-serif" font-size="80" font-weight="700" fill="white" letter-spacing="-3">tanış</text>
+  <text x="512" y="482" text-anchor="middle" font-family="system-ui,sans-serif" font-size="22" fill="white" opacity="0.75" letter-spacing="1">yeni insanlarla tanış, gerçek bağlantılar kur</text>
+</svg>

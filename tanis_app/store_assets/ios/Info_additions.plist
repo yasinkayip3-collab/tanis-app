@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Bu dosyayı ios/Runner/Info.plist içine ekle.
+  Mevcut <dict> bloğunun içine yapıştır.
+-->
+<plist version="1.0">
+<dict>
+
+  <!-- Uygulama adı -->
+  <key>CFBundleDisplayName</key>
+  <string>Tanış</string>
+
+  <!-- Minimum iOS sürümü -->
+  <key>MinimumOSVersion</key>
+  <string>13.0</string>
+
+  <!-- Galeri erişimi -->
+  <key>NSPhotoLibraryUsageDescription</key>
+  <string>Profil fotoğrafı seçmek için galeri erişimi gerekiyor.</string>
+
+  <key>NSPhotoLibraryAddUsageDescription</key>
+  <string>Fotoğrafları galerine kaydetmek için erişim gerekiyor.</string>
+
+  <!-- Kamera erişimi -->
+  <key>NSCameraUsageDescription</key>
+  <string>Profil fotoğrafı çekmek için kamera erişimi gerekiyor.</string>
+
+  <!-- Konum erişimi -->
+  <key>NSLocationWhenInUseUsageDescription</key>
+  <string>Yakınındaki kişileri gösterebilmek için konumun kullanılıyor.</string>
+
+  <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+  <string>Yakınındaki kişileri gösterebilmek için konumun kullanılıyor.</string>
+
+  <!-- Bildirimler -->
+  <key>UIBackgroundModes</key>
+  <array>
+    <string>remote-notification</string>
+  </array>
+
+  <!-- App Transport Security -->
+  <key>NSAppTransportSecurity</key>
+  <dict>
+    <key>NSAllowsArbitraryLoads</key>
+    <false/>
+  </dict>
+
+  <!-- URL Scheme (deep link için) -->
+  <key>CFBundleURLTypes</key>
+  <array>
+    <dict>
+      <key>CFBundleURLSchemes</key>
+      <array>
+        <string>tanis</string>
+      </array>
+    </dict>
+  </array>
+
+</dict>
+</plist>
