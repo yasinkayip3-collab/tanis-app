@@ -22,19 +22,14 @@ jobs:
       - name: Flutter kur
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.0'
+          flutter-version: '3.32.0'
           channel: 'stable'
 
-      - name: Proje klasörüne gir
-        run: cd tanis_app
+      - name: Flutter önbelleği
+        run: flutter config --no-analytics
 
       - name: Bağımlılıkları yükle
         run: flutter pub get
-        working-directory: tanis_app
-
-      - name: APK derle
-        run: flutter build apk --release --android-skip-build-dependency-validation
-        working-directory: tanis_app
 
       - name: APK derle
         run: flutter build apk --release --android-skip-build-dependency-validation
