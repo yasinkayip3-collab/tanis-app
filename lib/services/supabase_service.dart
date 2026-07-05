@@ -214,20 +214,22 @@ class SupabaseService {
         .maybeSingle();
 
     // Profilleri getir
-    var query = client
+    final seekingGender = prefs?['seeking_gender'];
+    final shouldFilterGender = seekingGender != null && seekingGender != 'Fark etmez';
+
+    final result = await client
         .from('users')
         .select('*, photos(*), user_interests(*)')
         .not('id', 'in', '(${swipedIds.join(',')})')
         .eq('is_active', true)
         .limit(20);
 
-    // Cinsiyet filtresi
-    if (prefs != null && prefs['seeking_gender'] != 'Fark etmez') {
-      query = query.eq('gender', prefs['seeking_gender']);
-    }
+    // Cinsiyet filtresi dart tarafında uygula
+    final filtered = shouldFilterGender
+        ? result.where((u) => u['gender'] == seekingGender).toList()
+        : result;
 
-    final result = await query;
-    return List<Map<String, dynamic>>.from(result);
+    return List<Map<String, dynamic>>.from(filtered);
   }
 
   // ─── Şikayet ──────────────────────────────────────────────────
