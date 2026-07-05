@@ -1,0 +1,39 @@
+name: Build APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Kodu indir
+        uses: actions/checkout@v4
+
+      - name: Java kur
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Flutter kur
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+
+      - name: Bağımlılıkları yükle
+        run: flutter pub get
+
+      - name: APK derle
+        run: flutter build apk --release --android-skip-build-dependency-validation
+
+      - name: APK kaydet
+        uses: actions/upload-artifact@v4
+        with:
+          name: tanis-app-release
+          path: build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 7
