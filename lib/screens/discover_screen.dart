@@ -289,7 +289,10 @@ class _SwipeCardState extends State<_SwipeCard> with SingleTickerProviderStateMi
   Widget build(BuildContext context) {
     final profile = widget.profile;
     final photos = profile['photos'] as List? ?? [];
-    final interests = profile['interests'] as List? ?? [];
+    final interests = (profile['user_interests'] as List? ?? [])
+        .map((i) => i is String ? i : (i['interest']?.toString() ?? ''))
+        .where((s) => s.isNotEmpty)
+        .toList();
     final name = profile['name'] ?? '';
 
     return GestureDetector(

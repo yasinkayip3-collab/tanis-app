@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SupabaseService {
@@ -106,10 +107,11 @@ class SupabaseService {
   static Future<String> uploadPhoto(String filePath, int order) async {
     final userId = currentUser!.id;
     final fileName = '$userId/photo_$order.jpg';
+    final file = File(filePath);
 
     await client.storage.from('photos').upload(
       fileName,
-      await _fileFromPath(filePath),
+      file,
       fileOptions: const FileOptions(upsert: true),
     );
 
@@ -188,12 +190,6 @@ class SupabaseService {
         .neq('sender_id', currentUser!.id);
   }
 
-  // ─── Yardımcı ──────────────────────────────────────────────────
-  static Future<dynamic> _fileFromPath(String path) async {
-    // image_picker'dan gelen XFile.path kullan
-    return path;
-  }
-
   // ─── Keşfet profilleri ─────────────────────────────────────────
   static Future<List<Map<String, dynamic>>> getDiscoverProfiles() async {
     final userId = currentUser!.id;
@@ -217,10 +213,13 @@ class SupabaseService {
     final seekingGender = prefs?['seeking_gender'];
     final shouldFilterGender = seekingGender != null && seekingGender != 'Fark etmez';
 
+    // SQL formatı için UUID'leri tırnak içine al
+    final idFilter = swipedIds.map((id) => "'$id'").join(',');
+
     final result = await client
         .from('users')
         .select('*, photos(*), user_interests(*)')
-        .not('id', 'in', '(${swipedIds.join(',')})')
+        .not('id', 'in', '($idFilter)')
         .eq('is_active', true)
         .limit(20);
 

@@ -1,7 +1,9 @@
 import '../main.dart';
-import '../services/supabase_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
+import '../theme.dart';
+import '../services/supabase_service.dart';
 
 // ─── Ana profil kurulum ekranı ─────────────────────────────────
 class ProfileSetupScreen extends StatefulWidget {
@@ -410,14 +412,12 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
   }
 
   Widget _buildPhotoSlot(int index) {
-    final hasPhoto = _photos[index] != null;
+    final photoUrl = _photos[index];
+    final hasPhoto = photoUrl != null;
+    final isUploading = _uploading[index] ?? false;
+
     return GestureDetector(
-      onTap: () {
-        // TODO: image_picker entegrasyonu
-        setState(() {
-          _photos[index] = hasPhoto ? null : 'placeholder_$index';
-        });
-      },
+      onTap: () => _pickAndUploadImage(index),
       child: Container(
         decoration: BoxDecoration(
           color: hasPhoto ? kSuccessLight : Colors.white,
@@ -425,25 +425,58 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
           border: Border.all(
             color: hasPhoto ? kSuccess : kBorder,
             width: 0.5,
-            style: hasPhoto ? BorderStyle.solid : BorderStyle.solid,
           ),
+          image: hasPhoto ? DecorationImage(image: NetworkImage(photoUrl!), fit: BoxFit.cover) : null,
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              hasPhoto ? Icons.check : (index == 0 ? Icons.add_a_photo_outlined : Icons.add),
-              color: hasPhoto ? kSuccess : kTextSecondary,
-              size: 22,
-            ),
-            if (index == 0 && !hasPhoto) ...[
-              const SizedBox(height: 4),
-              const Text('Ana', style: TextStyle(fontSize: 9, color: kTextSecondary)),
-            ],
-          ],
-        ),
+        child: isUploading 
+            ? const Center(child: CircularProgressIndicator(strokeWidth: 2))
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (!hasPhoto) ...[
+                    Icon(
+                      index == 0 ? Icons.add_a_photo_outlined : Icons.add,
+                      color: kTextSecondary,
+                      size: 22,
+                    ),
+                    if (index == 0) ...[
+                      const SizedBox(height: 4),
+                      const Text('Ana', style: TextStyle(fontSize: 9, color: kTextSecondary)),
+                    ],
+                  ] else ...[
+                    Align(
+                      alignment: Alignment.topRight,
+                      child: Container(
+                        margin: const EdgeInsets.all(4),
+                        padding: const EdgeInsets.all(2),
+                        decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                        child: const Icon(Icons.check, color: kSuccess, size: 14),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
       ),
     );
+  }
+
+  Future<void> _pickAndUploadImage(int index) async {
+    final picker = ImagePicker();
+    final image = await picker.pickImage(source: ImageSource.gallery, imageQuality: 70);
+    
+    if (image != null) {
+      setState(() => _uploading[index] = true);
+      try {
+        final url = await SupabaseService.uploadPhoto(image.path, index);
+        setState(() {
+          _photos[index] = url;
+          _uploading[index] = false;
+        });
+      } catch (e) {
+        setState(() => _uploading[index] = false);
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Yükleme başarısız')));
+      }
+    }
   }
 
   // ─── Adım 3: İlgi alanları ──────────────────────────────────────

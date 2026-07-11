@@ -8,14 +8,12 @@ import 'services/notification_service.dart';
 
 export 'theme.dart';
 
-Future<void> main() async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await Supabase.initialize(
     url: 'https://krywpgqgarkyhltphqge.supabase.co',
     anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtyeXdwZ3FnYXJreWhsdHBocWdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1NzAyMDMsImV4cCI6MjA5ODE0NjIwM30.jdm4OofdZM44IHR0qb9MezODuqD3xYeWVWmFF4geH_8',
   );
-
   await NotificationService.init();
   runApp(const TanisApp());
 }
@@ -30,12 +28,6 @@ class TanisApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: _buildTheme(),
       home: const AppRouter(),
-
-      // 🧪 TEST MODU — Supabase bağlantısını test etmek için:
-      // 1. Üstteki satırı yorum yap
-      // 2. Aşağıdaki satırın yorumunu kaldır
-      // import 'screens/supabase_test_screen.dart';
-      // home: const SupabaseTestScreen(),
     );
   }
 
@@ -45,7 +37,9 @@ class TanisApp extends StatelessWidget {
       useMaterial3: true,
       scaffoldBackgroundColor: kBackground,
       appBarTheme: const AppBarTheme(
-        backgroundColor: Colors.transparent, elevation: 0, centerTitle: true,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
         titleTextStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: kPrimary, letterSpacing: -0.3),
         iconTheme: IconThemeData(color: kTextPrimary),
       ),

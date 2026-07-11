@@ -178,7 +178,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         Wrap(spacing: 16, children: [
           _metaChip(Icons.location_on_outlined, _city),
           _metaChip(Icons.my_location_outlined,
-              (_profile?['preferences'] as List?)?.firstOrNull?['purpose'] ?? 'Arkadaşlık'),
+              (() {
+                final prefsList = _profile?['preferences'] as List?;
+                if (prefsList == null || prefsList.isEmpty) return 'Arkadaşlık';
+                return prefsList.first['purpose'] ?? 'Arkadaşlık';
+              })()),
           _metaChip(Icons.access_time_outlined, _lastSeen()),
         ]),
         if (_bio.isNotEmpty) ...[

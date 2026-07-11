@@ -188,7 +188,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildInfoSection() {
     final bio = _profile?['bio'] ?? '';
-    final prefs = (_profile?['preferences'] as List?)?.firstOrNull as Map? ?? {};
+    final prefsList = _profile?['preferences'] as List?;
+    final prefs = (prefsList != null && prefsList.isNotEmpty) ? prefsList.first as Map : {};
     final purpose = prefs['purpose'] ?? '—';
     final seeking = prefs['seeking_gender'] ?? '—';
     final ageMin = prefs['age_min'] ?? 18;
@@ -446,7 +447,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   void initState() {
     super.initState();
-    final prefs = (widget.profile['preferences'] as List?)?.firstOrNull as Map? ?? {};
+    final prefsList = widget.profile['preferences'] as List?;
+    final prefs = (prefsList != null && prefsList.isNotEmpty) ? prefsList.first as Map : {};
     _nameCtrl = TextEditingController(text: widget.profile['name'] ?? '');
     _bioCtrl  = TextEditingController(text: widget.profile['bio'] ?? '');
     _city     = widget.profile['city'] ?? 'Samsun';
