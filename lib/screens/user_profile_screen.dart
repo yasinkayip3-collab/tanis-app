@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../main.dart';
+import '../theme.dart';
 import '../services/supabase_service.dart';
 
 class UserProfileScreen extends StatefulWidget {
@@ -42,7 +42,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   int    get _age  => _calcAge(_profile?['birthdate']);
 
   List<String> get _interests => (_profile?['user_interests'] as List? ?? [])
-      .map((i) => i['interest']?.toString() ?? '')
+      .map<String>((i) => (i as Map)['interest']?.toString() ?? '')
       .where((s) => s.isNotEmpty)
       .toList();
 

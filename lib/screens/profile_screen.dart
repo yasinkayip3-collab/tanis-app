@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import '../main.dart';
+import '../theme.dart';
 import '../services/supabase_service.dart';
 
 // ─── Profil Ana Ekranı ─────────────────────────────────────────
@@ -217,7 +217,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildInterests() {
     final interests = (_profile?['user_interests'] as List? ?? [])
-        .map((i) => i['interest']?.toString() ?? '')
+        .map<String>((i) => (i as Map)['interest']?.toString() ?? '')
         .where((s) => s.isNotEmpty)
         .toList();
 
@@ -448,7 +448,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   void initState() {
     super.initState();
     final prefsList = widget.profile['preferences'] as List?;
-    final prefs = (prefsList != null && prefsList.isNotEmpty) ? prefsList.first as Map : {};
+    final prefs = (prefsList != null && prefsList.isNotEmpty) ? (prefsList.first as Map<String, dynamic>) : <String, dynamic>{};
     _nameCtrl = TextEditingController(text: widget.profile['name'] ?? '');
     _bioCtrl  = TextEditingController(text: widget.profile['bio'] ?? '');
     _city     = widget.profile['city'] ?? 'Samsun';
@@ -457,7 +457,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _ageMin   = (prefs['age_min'] ?? 18).toDouble();
     _ageMax   = (prefs['age_max'] ?? 35).toDouble();
     final raw = widget.profile['user_interests'] as List? ?? [];
-    _interests = raw.map((i) => i['interest']?.toString() ?? '').where((s) => s.isNotEmpty).toSet();
+    _interests = raw.map<String>((i) => (i as Map)['interest']?.toString() ?? '').where((s) => s.isNotEmpty).toSet();
   }
 
   @override

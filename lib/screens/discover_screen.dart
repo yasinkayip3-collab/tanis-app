@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import '../main.dart';
+import '../theme.dart';
 import '../services/supabase_service.dart';
 import 'match_screen.dart';
 import 'user_profile_screen.dart';
@@ -290,7 +290,7 @@ class _SwipeCardState extends State<_SwipeCard> with SingleTickerProviderStateMi
     final profile = widget.profile;
     final photos = profile['photos'] as List? ?? [];
     final interests = (profile['user_interests'] as List? ?? [])
-        .map((i) => i is String ? i : (i['interest']?.toString() ?? ''))
+        .map<String>((i) => i is String ? i : ((i as Map)['interest']?.toString() ?? ''))
         .where((s) => s.isNotEmpty)
         .toList();
     final name = profile['name'] ?? '';

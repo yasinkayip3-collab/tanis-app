@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../main.dart';
+import '../theme.dart';
 import 'discover_screen.dart';
 import 'chat_screen.dart';
 import 'profile_screen.dart';

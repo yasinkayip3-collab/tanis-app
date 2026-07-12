@@ -213,13 +213,10 @@ class SupabaseService {
     final seekingGender = prefs?['seeking_gender'];
     final shouldFilterGender = seekingGender != null && seekingGender != 'Fark etmez';
 
-    // SQL formatı için UUID'leri tırnak içine al
-    final idFilter = swipedIds.map((id) => "'$id'").join(',');
-
     final result = await client
         .from('users')
         .select('*, photos(*), user_interests(*)')
-        .not('id', 'in', '($idFilter)')
+        .filter('id', 'not.in', '(${swipedIds.join(",")})')
         .eq('is_active', true)
         .limit(20);
 

@@ -60,8 +60,8 @@ class TanisApp extends StatelessWidget {
         ),
       ),
       switchTheme: SwitchThemeData(
-        thumbColor: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.selected) ? kPrimary : null),
-        trackColor: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.selected) ? kPrimaryLight : null),
+        thumbColor: MaterialStateProperty.resolveWith((s) => s.contains(MaterialState.selected) ? kPrimary : null),
+        trackColor: MaterialStateProperty.resolveWith((s) => s.contains(MaterialState.selected) ? kPrimaryLight : null),
       ),
     );
   }

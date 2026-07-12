@@ -1,9 +1,9 @@
-import '../main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import '../theme.dart';
 import '../services/supabase_service.dart';
+// main.dart importu kaldırıldı, tema theme.dart'tan geliyor
 
 // ─── Ana profil kurulum ekranı ─────────────────────────────────
 class ProfileSetupScreen extends StatefulWidget {
@@ -26,6 +26,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
 
   // Adım 2 - Fotoğraf, şehir, bio
   final List<String?> _photos = [null, null, null, null];
+  final Map<int, bool> _uploading = {};
   String _city = 'Samsun';
   final _bioController = TextEditingController();
 

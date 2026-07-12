@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../main.dart';
+import '../theme.dart';
 import '../services/supabase_service.dart';
 
 // ─── Eşleşmeler listesi ────────────────────────────────────────

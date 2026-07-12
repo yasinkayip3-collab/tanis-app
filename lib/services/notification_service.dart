@@ -214,6 +214,6 @@ class NotificationService {
   }
 
   static int _notifId(String type, String id) {
-    return '${type}_$id'.hashCode.abs() % 100000;
+    return ('${type}_$id'.hashCode).abs() % 100000;
   }
 }

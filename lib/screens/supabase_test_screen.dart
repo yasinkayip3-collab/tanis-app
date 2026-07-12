@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../main.dart';
+import '../theme.dart';
 
 // ─── Supabase Bağlantı Test Ekranı ────────────────────────────
 // main.dart'ta geçici olarak home: const SupabaseTestScreen() yap

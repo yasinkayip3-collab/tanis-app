@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../main.dart';
+import '../theme.dart';
 import '../services/supabase_service.dart';
 import 'profile_setup_screen.dart';
 

@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import '../main.dart';
+import '../theme.dart';
 import 'chat_screen.dart';
 
 // ─── Eşleşme ekranı + konfeti ──────────────────────────────────
