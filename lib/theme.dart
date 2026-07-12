@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-
-// Tüm renkler tek yerden — theme.dart
 const kPrimary       = Color(0xFF7F77DD);
 const kPrimaryLight  = Color(0xFFEEEDFE);
 const kPrimaryDark   = Color(0xFF3C3489);
