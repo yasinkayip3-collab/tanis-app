@@ -22,12 +22,22 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   Future<void> _load() async {
     setState(() => _loading = true);
     try {
-      final uid = _client.auth.currentUser?.id ?? '';
+      final uid = _client.auth.currentUser?.id;
+      if (uid == null) { setState(() { _profiles = _mock; _loading = false; }); return; }
+      
       final swipes = await _client.from('swipes').select('to_user').eq('from_user', uid);
-      final ids = swipes.map((s) => s['to_user'].toString()).toList()..add(uid.isEmpty ? 'none' : uid);
-      final res = await _client.from('users').select('*, photos(*), user_interests(*)').not('id','in','(${ids.join(',')})').eq('is_active',true).limit(20);
+      final ids = swipes.map((s) => s['to_user'].toString()).toList();
+      ids.add(uid);
+      
+      List res;
+      if (ids.isEmpty) {
+        res = await _client.from('users').select('*, photos(*), user_interests(*)').neq('id', uid).eq('is_active', true).limit(20);
+      } else {
+        res = await _client.from('users').select('*, photos(*), user_interests(*)').not('id', 'in', '(${ids.join(',')})').eq('is_active', true).limit(20);
+      }
       setState(() { _profiles = List<Map<String,dynamic>>.from(res); _idx = 0; _loading = false; });
     } catch (e) {
+      debugPrint('Profil yükleme hatası: $e');
       setState(() { _profiles = _mock; _idx = 0; _loading = false; });
     }
   }
@@ -41,30 +51,33 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       if (uid == null) return;
       await _client.from('swipes').insert({'from_user': uid, 'to_user': profile['id'], 'action': action});
       if (action == 'like') await _checkMatch(profile);
-    } catch (_) {}
+    } catch (e) { debugPrint('Swipe hatası: $e'); }
   }
 
   Future<void> _checkMatch(Map<String,dynamic> profile) async {
     await Future.delayed(const Duration(milliseconds: 500));
     try {
-      final uid = _client.auth.currentUser!.id;
-      final res = await _client.from('matches').select().or('user1_id.eq.$uid,user2_id.eq.$uid').order('matched_at').limit(1);
+      final uid = _client.auth.currentUser?.id;
+      if (uid == null || !mounted) return;
+      final res = await _client.from('matches').select()
+          .or('user1_id.eq.$uid,user2_id.eq.$uid')
+          .order('matched_at', ascending: false).limit(1);
       if (res.isEmpty || !mounted) return;
       final match = res.first;
       final diff = DateTime.now().difference(DateTime.parse(match['matched_at'])).inSeconds;
       if (diff < 10) {
         Navigator.push(context, PageRouteBuilder(
-          pageBuilder: (_, __, ___) => MatchScreen(matchId: match['id'], otherName: profile['name'] ?? '', myName: ''),
+          pageBuilder: (_, __, ___) => MatchScreen(matchId: match['id'], otherName: profile['name'] ?? '', myName: '', otherUser: profile),
           transitionsBuilder: (_, anim, __, child) => FadeTransition(opacity: anim, child: child),
           transitionDuration: const Duration(milliseconds: 400)));
       }
-    } catch (_) {}
+    } catch (e) { debugPrint('Match kontrol hatası: $e'); }
   }
 
   @override
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: kBackground,
-    appBar: AppBar(title: const Text('tanış'), actions: [IconButton(icon: const Icon(Icons.tune_outlined), onPressed: () {})]),
+    appBar: AppBar(title: const Text('tanış')),
     body: _loading ? const Center(child: CircularProgressIndicator(color: kPrimary))
         : _idx >= _profiles.length ? _empty()
         : Column(children: [
@@ -95,7 +108,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: kBorder, width: 0.5)),
     child: ClipRRect(borderRadius: BorderRadius.circular(20), child: Column(children: [
       Expanded(flex: 3, child: Container(color: kPrimaryLight, width: double.infinity,
-        child: Center(child: Text(p['name']?[0] ?? '?', style: const TextStyle(fontSize: 72, color: kPrimary, fontWeight: FontWeight.w500))))),
+        child: Center(child: Text((p['name']?.toString() ?? '?').isNotEmpty ? p['name'].toString()[0] : '?',
+            style: const TextStyle(fontSize: 72, color: kPrimary, fontWeight: FontWeight.w500))))),
       Expanded(flex: 2, child: Container(color: Colors.white)),
     ])));
 
@@ -114,7 +128,6 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   final _mock = [
     {'id':'m1','name':'Ayşe','birthdate':'2000-05-12','city':'Samsun','bio':'Müzik seviyorum.','photos':[],'user_interests':[{'interest':'Müzik'},{'interest':'Seyahat'}]},
     {'id':'m2','name':'Merve','birthdate':'1998-09-23','city':'Ankara','bio':'Spor yapıyorum.','photos':[],'user_interests':[{'interest':'Spor'},{'interest':'Kitap'}]},
-    {'id':'m3','name':'Zeynep','birthdate':'2002-03-07','city':'İstanbul','bio':'Sanata meraklıyım.','photos':[],'user_interests':[{'interest':'Sanat'},{'interest':'Dans'}]},
   ];
 }
 
@@ -138,12 +151,11 @@ class _SwipeCardState extends State<_SwipeCard> with SingleTickerProviderStateMi
 
   void _onUpdate(DragUpdateDetails d) => setState(() { _off += d.delta; _angle = _off.dx/300*0.3; });
   void _onEnd(DragEndDetails _) {
-    if (_off.dx > 100) { _out(const Offset(600,0)); Future.delayed(const Duration(milliseconds: 280), widget.onRight); }
-    else if (_off.dx < -100) { _out(const Offset(-600,0)); Future.delayed(const Duration(milliseconds: 280), widget.onLeft); }
+    if (_off.dx > 100) { _animOut(const Offset(600,0)); Future.delayed(const Duration(milliseconds: 280), widget.onRight); }
+    else if (_off.dx < -100) { _animOut(const Offset(-600,0)); Future.delayed(const Duration(milliseconds: 280), widget.onLeft); }
     else _reset();
   }
-
-  void _out(Offset t) { final b=_off; final a=Tween<Offset>(begin:b,end:t).animate(CurvedAnimation(parent:_ctrl,curve:Curves.easeOut)); _ctrl.forward(from:0); a.addListener((){ setState((){_off=a.value;}); }); }
+  void _animOut(Offset t) { final b=_off; final a=Tween<Offset>(begin:b,end:t).animate(CurvedAnimation(parent:_ctrl,curve:Curves.easeOut)); _ctrl.forward(from:0); a.addListener((){ setState((){_off=a.value;}); }); }
   void _reset() { final b=_off; final a=Tween<Offset>(begin:b,end:Offset.zero).animate(CurvedAnimation(parent:_ctrl,curve:Curves.elasticOut)); _ctrl.forward(from:0); a.addListener((){ setState((){_off=a.value;_angle=_off.dx/300*0.3;}); }); }
 
   int _age(String? b) { if(b==null)return 0; final d=DateTime.tryParse(b); if(d==null)return 0; final n=DateTime.now(); int a=n.year-d.year; if(n.month<d.month||(n.month==d.month&&n.day<d.day))a--; return a; }
@@ -163,7 +175,7 @@ class _SwipeCardState extends State<_SwipeCard> with SingleTickerProviderStateMi
           child: ClipRRect(borderRadius: BorderRadius.circular(20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Expanded(flex: 3, child: Container(width: double.infinity, color: kPrimaryLight,
               child: photos.isNotEmpty
-                  ? Image.network(photos[0]['url']??'', fit: BoxFit.cover, errorBuilder: (_,__,___) => Center(child: Text(name.isNotEmpty?name[0]:'?', style: const TextStyle(fontSize: 72, color: kPrimary, fontWeight: FontWeight.w500))))
+                  ? Image.network(photos[0]['url']?.toString() ?? '', fit: BoxFit.cover, errorBuilder: (_,__,___) => Center(child: Text(name.isNotEmpty?name[0]:'?', style: const TextStyle(fontSize: 72, color: kPrimary, fontWeight: FontWeight.w500))))
                   : Center(child: Text(name.isNotEmpty?name[0]:'?', style: const TextStyle(fontSize: 72, color: kPrimary, fontWeight: FontWeight.w500))))),
             Expanded(flex: 2, child: Padding(padding: const EdgeInsets.fromLTRB(16,14,16,12), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
@@ -172,8 +184,8 @@ class _SwipeCardState extends State<_SwipeCard> with SingleTickerProviderStateMi
                 Text('${_age(p['birthdate']?.toString())}', style: const TextStyle(fontSize: 20, color: kTextSecondary)),
               ]),
               const SizedBox(height: 4),
-              Row(children: [const Icon(Icons.location_on_outlined, size: 14, color: kTextSecondary), const SizedBox(width: 3), Text(p['city']??'', style: const TextStyle(fontSize: 13, color: kTextSecondary))]),
-              if ((p['bio']??'').isNotEmpty) ...[const SizedBox(height: 6), Text(p['bio'], style: const TextStyle(fontSize: 13, color: kTextSecondary, height: 1.4), maxLines: 2, overflow: TextOverflow.ellipsis)],
+              Row(children: [const Icon(Icons.location_on_outlined, size: 14, color: kTextSecondary), const SizedBox(width: 3), Text(p['city']?.toString() ?? '', style: const TextStyle(fontSize: 13, color: kTextSecondary))]),
+              if ((p['bio']?.toString() ?? '').isNotEmpty) ...[const SizedBox(height: 6), Text(p['bio'].toString(), style: const TextStyle(fontSize: 13, color: kTextSecondary, height: 1.4), maxLines: 2, overflow: TextOverflow.ellipsis)],
               const Spacer(),
               if (interests.isNotEmpty) Wrap(spacing: 6, runSpacing: 4, children: interests.map((t) => Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
